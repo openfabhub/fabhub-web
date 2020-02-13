@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "ms-vscode.cpptools",
+        "go2sh.cmake-integration-vscode",
+        "twxs.cmake",
+        "xaver.clang-format"
+    ]
+}

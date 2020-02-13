@@ -1,0 +1,10 @@
+{
+    "C_Cpp.default.configurationProvider": "go2sh.cmake-integration",
+    "C_Cpp.autoAddFileAssociations": false,
+    "[cpp]": {
+        "editor.formatOnSave": true
+    },
+    "files.associations": {
+        ".clang-format": "yaml"
+    }
+}
