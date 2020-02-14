@@ -2,6 +2,7 @@
 #define MP_SUPPORT_LOGGER_MIXIN_HPP
 
 #include <spdlog/fmt/fmt.h>
+#include <spdlog/fmt/ostr.h>
 #include <spdlog/logger.h>
 
 #include <memory>
