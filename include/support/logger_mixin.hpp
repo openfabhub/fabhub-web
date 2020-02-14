@@ -65,6 +65,11 @@ namespace mp
       m_logger->critical(prefixed, std::forward<ParameterTypes>(parameters)...);
     }
 
+    auto logger_handle() -> logger
+    {
+      return m_logger;
+    }
+
   private:
     auto make_prefixed_format(std::string const & function, std::string const & format) const -> std::string
     {

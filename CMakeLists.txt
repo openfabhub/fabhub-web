@@ -42,7 +42,8 @@ conan_cmake_run(CONANFILE "conanfile.txt"
 # === Object Library === #
 
 add_library("core_objects" OBJECT
-  "src/server.cpp"
+  "src/net/connection.cpp"
+  "src/net/server.cpp"
 )
 
 target_include_directories("core_objects" PUBLIC
