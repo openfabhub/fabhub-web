@@ -88,6 +88,8 @@ install(TARGETS "${PROJECT_NAME}"
 
 add_executable("unittests"
   "test/src/driver.cpp"
+
+  "test/src/support/logger_mixin_suite.cpp"
 )
 
 target_include_directories("unittests" PRIVATE

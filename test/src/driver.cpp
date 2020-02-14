@@ -1,3 +1,5 @@
+#include "support/logger_mixin_suite.hpp"
+
 #include <cute/cute.h>
 #include <cute/cute_runner.h>
 #include <cute/tap_listener.h>
@@ -24,7 +26,9 @@ auto get_test_selectors(suite_list const & suites) -> std::vector<std::string>
 
   for_each(cbegin(suites), cend(suites), [&](auto descriptor) {
     auto const & [suite, name] = descriptor;
-    transform(cbegin(suite), cend(suite), std::back_inserter(selectors), [&, name = name](auto test) { return name + "#" + test.name(); });
+    transform(cbegin(suite), cend(suite), std::back_inserter(selectors), [&, name = name](auto test) {
+      return name + "#" + test.name();
+    });
   });
 
   return selectors;
@@ -43,7 +47,9 @@ auto do_run_tests(suite_list const & suites, int argc, char ** argv) -> bool
 
 int main(int argc, char ** argv)
 {
-  auto suites = std::vector<std::pair<cute::suite, std::string>>{};
+  auto suites = std::vector{
+      logger_mixin_suite(),
+  };
 
   auto selectors = get_test_selectors(suites);
 
