@@ -12,6 +12,7 @@
 #include <spdlog/fmt/fmt.h>
 
 #include <algorithm>
+#include <exception>
 #include <iterator>
 #include <stdexcept>
 #include <system_error>
@@ -30,19 +31,33 @@ namespace mp::net
     }
   };
 
+  template<typename... ParameterTypes>
+  auto create_server(logger logger, ParameterTypes &&... parameters) -> server_ptr
+  {
+    try
+    {
+      return std::make_shared<server_ctor_access>(std::forward<ParameterTypes>(parameters)..., logger);
+    }
+    catch (std::exception const & e)
+    {
+      logger->error("create", "failed to instantiate server. reason: {}", e.what());
+      return {};
+    }
+  }
+
   auto server::create(boost::asio::io_context & io_context, port port, logger logger) -> server_ptr
   {
-    return std::make_shared<server_ctor_access>(io_context, port, logger);
+    return create_server(logger, io_context, port);
   }
 
   auto server::create(boost::asio::io_context & io_context, ip_address ip, port port, logger logger) -> server_ptr
   {
-    return std::make_shared<server_ctor_access>(io_context, ip, port, logger);
+    return create_server(logger, io_context, ip, port);
   }
 
   auto server::create(boost::asio::io_context & io_context, hostname host, port port, logger logger) -> server_ptr
   {
-    return std::make_shared<server_ctor_access>(io_context, host, port, logger);
+    return create_server(logger, io_context, host, port);
   }
 
   server::server(boost::asio::io_context & io_context, logger logger)

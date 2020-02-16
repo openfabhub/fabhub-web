@@ -10,7 +10,6 @@
 
 #include <csignal>
 #include <cstdlib>
-#include <exception>
 #include <memory>
 #include <string>
 #include <utility>
@@ -21,28 +20,16 @@ auto make_logger(std::string name) -> std::shared_ptr<spdlog::logger>
   return std::make_shared<spdlog::logger>(std::move(name), stdio_sink);
 }
 
-auto make_server(boost::asio::io_context & io_context, mp::net::ip_address ip, mp::net::port port, mp::logger logger)
-{
-  try
-  {
-    return mp::net::server::create(io_context, ip, port, logger);
-  }
-  catch (std::exception const & e)
-  {
-    logger->critical("unhandled exception during startup: {}", e.what());
-  }
-  return mp::net::server_ptr{};
-}
-
 auto main() -> int
 {
-  using namespace mp::literals;
+  using namespace mp;
+
+  auto io_context = boost::asio::io_context{};
 
   auto logger = make_logger("mofprint");
   logger->info("starting up");
-  auto io_context = boost::asio::io_context{};
 
-  auto server = make_server(io_context, mp::net::default_listen_address, mp::net::default_listen_port, logger);
+  auto server = net::server::create(io_context, net::default_listen_address, net::default_listen_port, logger);
   if (!server)
   {
     return EXIT_FAILURE;
