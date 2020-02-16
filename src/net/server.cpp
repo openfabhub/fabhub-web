@@ -1,5 +1,6 @@
 #include "net/server.hpp"
 
+#include "support/asio_log_support.hpp"
 #include "support/logger_mixin.hpp"
 
 #include <boost/asio/io_context.hpp>
@@ -85,8 +86,12 @@ namespace mp::net
     else
     {
       auto const remote = socket.remote_endpoint();
-      log_info("on_accept", "accepted new connection from '{}:{}'", remote.address().to_string(), remote.port());
-      m_connections.insert(connection::create(std::move(socket), logger_handle()));
+      log_info("on_accept", "accepted new connection from '{}'", remote);
+      auto [connection, inserted] = m_connections.insert(connection::create(std::move(socket), logger_handle()));
+      if (inserted)
+      {
+        (*connection)->start();
+      }
     }
     do_accept();
   }

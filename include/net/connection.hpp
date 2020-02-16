@@ -4,7 +4,13 @@
 #include "support/logger_mixin.hpp"
 
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/beast/core/error.hpp>
+#include <boost/beast/core/flat_buffer.hpp>
+#include <boost/beast/core/tcp_stream.hpp>
+#include <boost/beast/http/message.hpp>
+#include <boost/beast/http/string_body.hpp>
 
+#include <cstddef>
 #include <memory>
 
 namespace mp::net
@@ -18,11 +24,20 @@ namespace mp::net
   {
     auto static create(boost::asio::ip::tcp::socket socket, logger logger) -> connection_ptr;
 
+    auto close() -> void;
+    auto start() -> void;
+
   protected:
     connection(boost::asio::ip::tcp::socket socket, logger logger);
 
   private:
-    boost::asio::ip::tcp::socket m_socket;
+    auto do_read() -> void;
+    auto on_read(boost::beast::error_code error, std::size_t bytes) -> void;
+
+    boost::asio::ip::tcp::endpoint m_remote;
+    boost::beast::tcp_stream m_stream;
+    boost::beast::flat_buffer m_buffer;
+    boost::beast::http::request<boost::beast::http::string_body> m_request;
   };
 
 }  // namespace mp::net
