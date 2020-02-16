@@ -1,0 +1,32 @@
+os: linux
+language: python
+python: "3.7"
+dist: bionic
+
+addons:
+  apt:
+    sources:
+      - sourceline: "ppa:ubuntu-toolchain-r/test"
+    packages: ['g++-9']
+
+compiler:
+  - gcc
+
+env:
+  - CXX=g++-9
+
+cache:
+  directories:
+    - $HOME/.conan/data
+
+install:
+  - pip install conan
+  - conan user
+  - wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add -
+  - sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+  - sudo apt-get update
+  - sudo apt-get install cmake
+  
+script:
+  - /usr/bin/cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+  - /usr/bin/cmake --build build --target all
