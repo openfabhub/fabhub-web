@@ -48,9 +48,12 @@ auto main() -> int
   }
   server->start();
 
-  auto signals = boost::asio::signal_set{io_context, SIGINT};
-  signals.async_wait([&](auto, auto) {
-    server->stop();
+  auto signals = boost::asio::signal_set{io_context, SIGINT, SIGTERM};
+  signals.async_wait([&](auto error, auto) {
+    if (!error)
+    {
+      server->stop();
+    }
   });
 
   io_context.run();
