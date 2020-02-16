@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION "3.16.0")
+cmake_minimum_required(VERSION "3.15.0")
 
 project("mofprint"
   VERSION "1.0.0"
@@ -30,12 +30,18 @@ find_package("Threads")
 
 # === Conan Configuration === #
 
+if(EXISTS "/.dockerenv")
+  set(CONAN_BUILD_DEPS "all")
+else()
+  set(CONAN_BUILD_DEPS "missing")
+endif()
+
 conan_check(REQUIRED)
 conan_add_remote(NAME "fmorgner-public" URL "https://api.bintray.com/conan/fmorgner/conan-public")
 conan_cmake_run(CONANFILE "conanfile.txt"
   BASIC_SETUP
   CMAKE_TARGETS
-  BUILD "missing"
+  BUILD "${CONAN_BUILD_DEPS}"
   NO_OUTPUT_DIRS
 )
 

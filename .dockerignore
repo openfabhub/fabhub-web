@@ -1,7 +1,4 @@
-# Exclude everything
+# General Excludes
 
-*
-
-# Reinclude image components
-
-!/build/mofprint
+/.vscode
+/build
