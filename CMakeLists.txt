@@ -50,6 +50,7 @@ conan_cmake_run(CONANFILE "conanfile.py"
 add_library("core_objects" OBJECT
   "src/net/connection.cpp"
   "src/net/server.cpp"
+  "src/support/logger.cpp"
 )
 
 target_include_directories("core_objects" PUBLIC
