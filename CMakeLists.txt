@@ -38,7 +38,7 @@ endif()
 
 conan_check(REQUIRED)
 conan_add_remote(NAME "fmorgner-public" URL "https://api.bintray.com/conan/fmorgner/conan-public")
-conan_cmake_run(CONANFILE "conanfile.txt"
+conan_cmake_run(CONANFILE "conanfile.py"
   BASIC_SETUP
   CMAKE_TARGETS
   BUILD "${CONAN_BUILD_DEPS}"
