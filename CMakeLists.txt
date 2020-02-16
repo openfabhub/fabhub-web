@@ -87,6 +87,11 @@ target_link_libraries("${PROJECT_NAME}"
   "-static-libgcc"
 )
 
+set_target_properties("${PROJECT_NAME}"
+  PROPERTIES
+  LINK_FLAGS_RELEASE "-s"
+)
+
 install(TARGETS "${PROJECT_NAME}"
   RUNTIME DESTINATION "bin"
 )
