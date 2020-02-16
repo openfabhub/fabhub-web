@@ -11,6 +11,8 @@
 #include <boost/system/system_error.hpp>
 #include <spdlog/fmt/fmt.h>
 
+#include <algorithm>
+#include <iterator>
 #include <stdexcept>
 #include <system_error>
 
@@ -94,6 +96,18 @@ namespace mp::net
     return {};
   }
 
+  auto server::stop() -> void
+  {
+    log_info("close", "gracefully shutting down the server");
+    auto ignored = boost::system::error_code{};
+    m_acceptor.cancel(ignored);
+    m_acceptor.close(ignored);
+    for_each(begin(m_connections), end(m_connections), [this](auto connection) {
+      connection->unsubscribe(shared_from_this());
+      connection->close();
+    });
+  }
+
   auto server::on_close(connection_ptr connection) -> void
   {
     auto erased = m_connections.erase(connection);
@@ -123,8 +137,8 @@ namespace mp::net
         (*connection)->start();
         (*connection)->subscribe(shared_from_this());
       }
+      do_accept();
     }
-    do_accept();
   }
 
 }  // namespace mp::net

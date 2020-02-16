@@ -32,6 +32,7 @@ namespace mp::net
     auto static create(boost::asio::io_context & io_context, hostname host, port port, logger logger) -> server_ptr;
 
     auto start() noexcept -> std::error_code;
+    auto stop() -> void;
 
     auto on_close(connection_ptr connection) -> void override;
 
