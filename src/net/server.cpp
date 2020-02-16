@@ -123,11 +123,11 @@ namespace mp::net
 
   auto server::on_accept(boost::beast::error_code error, boost::asio::ip::tcp::socket socket) -> void
   {
-    if (error)
+    if (error && error != boost::asio::error::operation_aborted)
     {
       log_error("on_accept", "failed to accept connection. reason: {}", error.message());
     }
-    else
+    else if (!error)
     {
       auto const remote = socket.remote_endpoint();
       log_info("on_accept", "accepted new connection from '{}'", remote);

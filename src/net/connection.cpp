@@ -85,17 +85,21 @@ namespace mp::net
   {
     log_debug("on_read", "read {} bytes from '{}'", bytes, m_remote);
 
-    if (error == boost::beast::http::error::end_of_stream)
+    if (error)
     {
-      close();
-    }
-    else if (error)
-    {
-      log_error("on_read", "failed to read a request from '{}'. reason: {}", m_remote, error.message());
-      close();
+      if (error == boost::beast::http::error::end_of_stream)
+      {
+        close();
+      }
+      else if (error != boost::asio::error::operation_aborted)
+      {
+        log_error("on_read", "failed to read a request from '{}'. reason: {}", m_remote, error.message());
+        close();
+      }
     }
     else
     {
+
       do_read();
     }
   }
