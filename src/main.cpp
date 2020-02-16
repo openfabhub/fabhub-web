@@ -1,3 +1,4 @@
+#include "net/defaults.hpp"
 #include "net/hostname.hpp"
 #include "net/ip_address.hpp"
 #include "net/server.hpp"
@@ -41,7 +42,7 @@ auto main() -> int
   logger->info("starting up");
   auto io_context = boost::asio::io_context{};
 
-  auto server = make_server(io_context, "0.0.0.0"_ip, 51717_port, logger);
+  auto server = make_server(io_context, mp::net::default_listen_address, mp::net::default_listen_port, logger);
   if (!server)
   {
     return EXIT_FAILURE;
