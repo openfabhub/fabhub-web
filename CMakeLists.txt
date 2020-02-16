@@ -104,29 +104,3 @@ target_link_libraries("unittests"
 )
 
 discover_tests(TARGET "unittests")
-
-# === Docker Image === #
-
-find_program(DOCKER_EXE "docker")
-
-if(DOCKER_EXE)
-  file(RELATIVE_PATH APP_EXECUTABLE "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}/${PROJECT_NAME}")
-
-  add_custom_command(TARGET "${PROJECT_NAME}"
-    POST_BUILD
-    COMMAND
-    "${DOCKER_EXE}"
-    ARGS 
-    "build"
-    "${PROJECT_SOURCE_DIR}"
-    "--build-arg=app_executable=\"${APP_EXECUTABLE}\""
-    "-t"
-    "fmorgner/mofprint:latest"
-    "-t"
-    "fmorgner/mofprint:${PROJECT_VERSION}"
-    WORKING_DIRECTORY
-    "${PROJECT_SOURCE_DIR}"
-    COMMENT
-    "Building docker image"
-  )
-endif()
