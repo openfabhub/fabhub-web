@@ -19,6 +19,30 @@ namespace mp::net
 
   using namespace mp::literals;
 
+  struct server_ctor_access : server
+  {
+    template<typename... ParameterTypes>
+    server_ctor_access(ParameterTypes &&... parameters)
+        : server(std::forward<ParameterTypes>(parameters)...)
+    {
+    }
+  };
+
+  auto server::create(boost::asio::io_context & io_context, port port, logger logger) -> server_ptr
+  {
+    return std::make_shared<server_ctor_access>(io_context, port, logger);
+  }
+
+  auto server::create(boost::asio::io_context & io_context, ip_address ip, port port, logger logger) -> server_ptr
+  {
+    return std::make_shared<server_ctor_access>(io_context, ip, port, logger);
+  }
+
+  auto server::create(boost::asio::io_context & io_context, hostname host, port port, logger logger) -> server_ptr
+  {
+    return std::make_shared<server_ctor_access>(io_context, host, port, logger);
+  }
+
   server::server(boost::asio::io_context & io_context, logger logger)
       : logger_mixin{logger, "server"}
       , m_io_context{io_context}
@@ -70,6 +94,12 @@ namespace mp::net
     return {};
   }
 
+  auto server::on_close(connection_ptr connection) -> void
+  {
+    auto erased = m_connections.erase(connection);
+    log_info("on_close", "erased {} connections from the pool, {} remain", erased, m_connections.size());
+  }
+
   auto server::do_accept() -> void
   {
     log_debug("do_accept", "waiting for an incoming connection");
@@ -91,6 +121,7 @@ namespace mp::net
       if (inserted)
       {
         (*connection)->start();
+        (*connection)->subscribe(shared_from_this());
       }
     }
     do_accept();

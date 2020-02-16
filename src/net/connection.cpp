@@ -9,8 +9,10 @@
 #include <boost/beast/core/error.hpp>
 #include <boost/beast/http/read.hpp>
 
+#include <algorithm>
 #include <chrono>
 #include <cstddef>
+#include <iterator>
 #include <utility>
 
 using namespace std::literals;
@@ -33,6 +35,7 @@ namespace mp::net
       , m_stream{std::move(socket)}
       , m_buffer{}
       , m_request{}
+      , m_subscribers{}
   {
   }
 
@@ -47,6 +50,7 @@ namespace mp::net
     auto ignored = boost::beast::error_code{};
     m_stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored);
     m_stream.close();
+    notify_subscribers(close_event{});
   }
 
   auto connection::start() -> void
@@ -54,6 +58,17 @@ namespace mp::net
     log_info("start", "starting conversation with '{}'", m_remote);
     boost::asio::dispatch(m_stream.get_executor(),
                           boost::beast::bind_front_handler(&connection::do_read, shared_from_this()));
+  }
+
+  auto connection::subscribe(subscriber_ptr subscriber) -> bool
+  {
+    auto [_, inserted] = m_subscribers.insert(subscriber);
+    return inserted;
+  }
+
+  auto connection::unsubscribe(subscriber_ptr subscriber) -> bool
+  {
+    return m_subscribers.erase(subscriber);
   }
 
   auto connection::do_read() -> void
@@ -83,6 +98,34 @@ namespace mp::net
     {
       do_read();
     }
+  }
+
+  auto connection::notify_subscribers(request_type request) -> void
+  {
+    log_trace("notify_subscribers", "notifying {} subscribers about an incoming request", m_subscribers.size());
+    for_each(begin(m_subscribers), end(m_subscribers), [this, &request](auto subscriber) {
+      subscriber->on_request(shared_from_this(), request);
+    });
+  }
+
+  auto connection::notify_subscribers(error_type error) -> void
+  {
+    log_trace("notify_subscribers",
+              "notifying {} subscribers about the following error: ",
+              m_subscribers.size(),
+              error.message());
+    for_each(begin(m_subscribers), end(m_subscribers), [this, &error](auto subscriber) {
+      subscriber->on_error(shared_from_this(), error);
+    });
+  }
+
+  auto connection::notify_subscribers(close_event) -> void
+  {
+    log_trace("notify_subscribers", "notifying {} subscribers about connection closure", m_subscribers.size());
+    for_each(begin(m_subscribers), end(m_subscribers), [this](auto subscriber) {
+      subscriber->on_close(shared_from_this());
+    });
+    m_subscribers.clear();
   }
 
 }  // namespace mp::net

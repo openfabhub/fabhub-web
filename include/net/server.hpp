@@ -12,21 +12,33 @@
 #include <boost/beast/core/error.hpp>
 #include <boost/beast/http.hpp>
 
+#include <memory>
 #include <set>
 #include <system_error>
 
 namespace mp::net
 {
 
-  struct server : logger_mixin
+  using server_ptr = std::shared_ptr<struct server>;
+
+  struct server
+      : std::enable_shared_from_this<server>
+      , logger_mixin
+      , connection::event_subscriber
   {
-    server(boost::asio::io_context & io_context, port port, logger logger);
 
-    server(boost::asio::io_context & io_context, ip_address ip, port port, logger logger);
-
-    server(boost::asio::io_context & io_context, hostname host, port port, logger logger);
+    auto static create(boost::asio::io_context & io_context, port port, logger logger) -> server_ptr;
+    auto static create(boost::asio::io_context & io_context, ip_address ip, port port, logger logger) -> server_ptr;
+    auto static create(boost::asio::io_context & io_context, hostname host, port port, logger logger) -> server_ptr;
 
     auto start() noexcept -> std::error_code;
+
+    auto on_close(connection_ptr connection) -> void override;
+
+  protected:
+    server(boost::asio::io_context & io_context, port port, logger logger);
+    server(boost::asio::io_context & io_context, ip_address ip, port port, logger logger);
+    server(boost::asio::io_context & io_context, hostname host, port port, logger logger);
 
   private:
     server(boost::asio::io_context & io_context, logger logger);

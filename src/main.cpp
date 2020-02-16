@@ -27,8 +27,8 @@ auto main() -> int
 
   try
   {
-    auto server = mp::net::server{io_context, "0.0.0.0"_ip, 51717_port, logger};
-    server.start();
+    auto server = mp::net::server::create(io_context, "0.0.0.0"_ip, 51717_port, logger);
+    server->start();
 
     io_context.run();
   }
