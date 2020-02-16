@@ -110,3 +110,11 @@ target_link_libraries("unittests"
 )
 
 discover_tests(TARGET "unittests")
+
+add_custom_command(TARGET "unittests"
+  POST_BUILD
+  COMMAND "${CMAKE_CTEST_COMMAND}"
+  ARGS "--output-on-failure"
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}"
+  COMMENT "Running unit tests"
+)
