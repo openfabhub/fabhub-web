@@ -19,7 +19,7 @@ auto main() -> int
 
   auto io_context = boost::asio::io_context{};
 
-  auto logger = make_logger("mofprint");
+  auto logger = make_logger("web");
   logger->info("starting up");
 
   auto server = net::server::create(io_context, net::default_listen_address, net::default_listen_port, logger);
