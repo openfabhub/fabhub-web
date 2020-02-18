@@ -9,7 +9,7 @@
 #include <string_view>
 #include <utility>
 
-namespace mp
+namespace fhw
 {
 
   using logger = std::shared_ptr<spdlog::logger>;
@@ -80,6 +80,6 @@ namespace mp
     std::string_view m_class_name;
   };
 
-}  // namespace mp
+}  // namespace fhw
 
 #endif

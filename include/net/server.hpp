@@ -16,7 +16,7 @@
 #include <set>
 #include <system_error>
 
-namespace mp::net
+namespace fhw::net
 {
 
   using server_ptr = std::shared_ptr<struct server>;
@@ -55,6 +55,6 @@ namespace mp::net
     std::set<connection_ptr> m_connections{};
   };
 
-}  // namespace mp::net
+}  // namespace fhw::net
 
 #endif

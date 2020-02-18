@@ -15,16 +15,16 @@ def read_project_property(property: str) -> Optional[str]:
         return None
 
 
-class MofprintConan(ConanFile):
-    name = "mofprint"
+class FabhubWebConan(ConanFile):
+    name = "fabhub-web"
     description = read_project_property("DESCRIPTION")
     version = read_project_property("VERSION")
     license = "BSD-3-Clause"
-    homepage = "https://github.com/fmorgner/mofprint"
+    homepage = "https://github.com/fabhub/web"
     url = homepage
     scm = {
         "type": "git",
-        "url": "https://github.com/fmorgner/mofprint.git",
+        "url": "https://github.com/fabhub/web.git",
         "revision": "auto"
     }
 

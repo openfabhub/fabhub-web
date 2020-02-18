@@ -13,9 +13,9 @@
 #include <string>
 #include <utility>
 
-struct logging : mp::logger_mixin
+struct logging : fhw::logger_mixin
 {
-  explicit logging(mp::logger logger)
+  explicit logging(fhw::logger logger)
       : logger_mixin{logger, "logging"}
   {
   }
@@ -51,7 +51,7 @@ struct logging : mp::logger_mixin
   }
 };
 
-auto make_logger(std::string name, std::ostream & ostream) -> mp::logger
+auto make_logger(std::string name, std::ostream & ostream) -> fhw::logger
 {
   auto sink = std::make_shared<spdlog::sinks::ostream_sink_st>(ostream, true);
   auto logger = std::make_shared<spdlog::logger>(name, sink);
@@ -63,7 +63,7 @@ auto make_logger(std::string name, std::ostream & ostream) -> mp::logger
   return logger;
 }
 
-auto a_type_derived_from_mp_logger_mixin_can_write_trace_logs() -> void
+auto a_type_derived_from_logger_mixin_can_write_trace_logs() -> void
 {
   auto stream = std::ostringstream{};
   auto logger = make_logger("trace_test_0", stream);
@@ -74,7 +74,7 @@ auto a_type_derived_from_mp_logger_mixin_can_write_trace_logs() -> void
   ASSERT_EQUAL("trace: logging::perform_trace_log: This is a trace log. 42\n", stream.str());
 }
 
-auto a_type_derived_from_mp_logger_mixin_can_write_debug_logs() -> void
+auto a_type_derived_from_logger_mixin_can_write_debug_logs() -> void
 {
   auto stream = std::ostringstream{};
   auto logger = make_logger("debug_test_0", stream);
@@ -85,7 +85,7 @@ auto a_type_derived_from_mp_logger_mixin_can_write_debug_logs() -> void
   ASSERT_EQUAL("debug: logging::perform_debug_log: This is a debug log. 42\n", stream.str());
 }
 
-auto a_type_derived_from_mp_logger_mixin_can_write_info_logs() -> void
+auto a_type_derived_from_logger_mixin_can_write_info_logs() -> void
 {
   auto stream = std::ostringstream{};
   auto logger = make_logger("info_test_0", stream);
@@ -96,7 +96,7 @@ auto a_type_derived_from_mp_logger_mixin_can_write_info_logs() -> void
   ASSERT_EQUAL("info: logging::perform_info_log: This is a info log. 42\n", stream.str());
 }
 
-auto a_type_derived_from_mp_logger_mixin_can_write_warn_logs() -> void
+auto a_type_derived_from_logger_mixin_can_write_warn_logs() -> void
 {
   auto stream = std::ostringstream{};
   auto logger = make_logger("warn_test_0", stream);
@@ -107,7 +107,7 @@ auto a_type_derived_from_mp_logger_mixin_can_write_warn_logs() -> void
   ASSERT_EQUAL("warning: logging::perform_warn_log: This is a warn log. 42\n", stream.str());
 }
 
-auto a_type_derived_from_mp_logger_mixin_can_write_error_logs() -> void
+auto a_type_derived_from_logger_mixin_can_write_error_logs() -> void
 {
   auto stream = std::ostringstream{};
   auto logger = make_logger("error_test_0", stream);
@@ -118,7 +118,7 @@ auto a_type_derived_from_mp_logger_mixin_can_write_error_logs() -> void
   ASSERT_EQUAL("error: logging::perform_error_log: This is a error log. 42\n", stream.str());
 }
 
-auto a_type_derived_from_mp_logger_mixin_can_write_critical_logs() -> void
+auto a_type_derived_from_logger_mixin_can_write_critical_logs() -> void
 {
   auto stream = std::ostringstream{};
   auto logger = make_logger("critical_test_0", stream);
@@ -133,12 +133,12 @@ auto logger_mixin_suite() -> std::pair<cute::suite, std::string>
 {
   return {
       {
-          KAWAII(a_type_derived_from_mp_logger_mixin_can_write_trace_logs),
-          KAWAII(a_type_derived_from_mp_logger_mixin_can_write_debug_logs),
-          KAWAII(a_type_derived_from_mp_logger_mixin_can_write_info_logs),
-          KAWAII(a_type_derived_from_mp_logger_mixin_can_write_warn_logs),
-          KAWAII(a_type_derived_from_mp_logger_mixin_can_write_error_logs),
-          KAWAII(a_type_derived_from_mp_logger_mixin_can_write_critical_logs),
+          KAWAII(a_type_derived_from_logger_mixin_can_write_trace_logs),
+          KAWAII(a_type_derived_from_logger_mixin_can_write_debug_logs),
+          KAWAII(a_type_derived_from_logger_mixin_can_write_info_logs),
+          KAWAII(a_type_derived_from_logger_mixin_can_write_warn_logs),
+          KAWAII(a_type_derived_from_logger_mixin_can_write_error_logs),
+          KAWAII(a_type_derived_from_logger_mixin_can_write_critical_logs),
       },
       "logger_mixin Suite",
   };

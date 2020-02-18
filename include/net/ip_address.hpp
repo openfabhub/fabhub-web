@@ -6,7 +6,7 @@
 #include <cstddef>
 #include <string>
 
-namespace mp
+namespace fhw
 {
   namespace net
   {
@@ -28,6 +28,6 @@ namespace mp
     using namespace net::literals;
   }
 
-}  // namespace mp
+}  // namespace fhw
 
 #endif

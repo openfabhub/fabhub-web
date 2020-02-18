@@ -36,6 +36,6 @@ RUN cmake -S /src \
 # Deployment Image
 FROM scratch
 
-COPY --from=buildenv /build/mofprint /mofprint
+COPY --from=buildenv /build/fabhub-web /fabhub-web
 
-CMD ["/mofprint"]
+CMD ["/fabhub-web"]

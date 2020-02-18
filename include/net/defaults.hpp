@@ -4,12 +4,12 @@
 #include "net/ip_address.hpp"
 #include "net/port.hpp"
 
-namespace mp::net
+namespace fhw::net
 {
 
   auto const default_listen_address = ip_address{"0.0.0.0"};
   auto constexpr default_listen_port = port{51717};
 
-}  // namespace mp::net
+}  // namespace fhw::net
 
 #endif

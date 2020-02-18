@@ -6,7 +6,7 @@
 #include <string>
 #include <utility>
 
-namespace mp
+namespace fhw
 {
 
   auto make_logger(std::string name) -> std::shared_ptr<spdlog::logger>
@@ -15,4 +15,4 @@ namespace mp
     return std::make_shared<spdlog::logger>(std::move(name), stdio_sink);
   }
 
-}  // namespace mp
+}  // namespace fhw

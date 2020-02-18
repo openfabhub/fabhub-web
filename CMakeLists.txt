@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION "3.15.0")
 
-project("mofprint"
+project("fabhub-web"
   VERSION "1.0.0"
   LANGUAGES CXX
-  DESCRIPTION "mofprint.ch"
+  DESCRIPTION "Fabhub"
 )
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")

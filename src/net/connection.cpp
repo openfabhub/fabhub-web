@@ -18,7 +18,7 @@
 
 using namespace std::literals;
 
-namespace mp::net
+namespace fhw::net
 {
 
   struct connection_ctor_access : connection
@@ -142,4 +142,4 @@ namespace mp::net
     });
   }
 
-}  // namespace mp::net
+}  // namespace fhw::net

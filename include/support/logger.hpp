@@ -6,11 +6,11 @@
 #include <memory>
 #include <string>
 
-namespace mp
+namespace fhw
 {
 
   auto make_logger(std::string name) -> std::shared_ptr<spdlog::logger>;
 
-}  // namespace mp
+}  // namespace fhw
 
 #endif
