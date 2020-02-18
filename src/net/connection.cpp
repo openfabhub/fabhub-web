@@ -5,6 +5,7 @@
 
 #include <boost/asio/dispatch.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/strand.hpp>
 #include <boost/beast/core/bind_handler.hpp>
 #include <boost/beast/core/error.hpp>
 #include <boost/beast/http/read.hpp>
@@ -29,9 +30,10 @@ namespace mp::net
     }
   };
 
-  connection::connection(boost::asio::ip::tcp::socket socket, logger logger)
+  connection::connection(boost::asio::io_context & io_context, boost::asio::ip::tcp::socket socket, logger logger)
       : logger_mixin{logger, "connection"}
       , m_remote{socket.remote_endpoint()}
+      , m_notification_strand{io_context}
       , m_stream{std::move(socket)}
       , m_buffer{}
       , m_request{}
@@ -39,9 +41,10 @@ namespace mp::net
   {
   }
 
-  auto connection::create(boost::asio::ip::tcp::socket socket, logger logger) -> connection_ptr
+  auto connection::create(boost::asio::io_context & io_context, boost::asio::ip::tcp::socket socket, logger logger)
+      -> connection_ptr
   {
-    return std::make_shared<connection_ctor_access>(std::move(socket), logger);
+    return std::make_shared<connection_ctor_access>(io_context, std::move(socket), logger);
   }
 
   auto connection::close() -> void
@@ -60,15 +63,18 @@ namespace mp::net
                           boost::beast::bind_front_handler(&connection::do_read, shared_from_this()));
   }
 
-  auto connection::subscribe(subscriber_ptr subscriber) -> bool
+  auto connection::subscribe(subscriber_ptr subscriber) -> void
   {
-    auto [_, inserted] = m_subscribers.insert(subscriber);
-    return inserted;
+    m_notification_strand.post([this, subscriber, _ = shared_from_this()] {
+      m_subscribers.insert(subscriber);
+    });
   }
 
-  auto connection::unsubscribe(subscriber_ptr subscriber) -> bool
+  auto connection::unsubscribe(subscriber_ptr subscriber) -> void
   {
-    return m_subscribers.erase(subscriber);
+    m_notification_strand.post([this, subscriber, _ = shared_from_this()] {
+      m_subscribers.erase(subscriber);
+    });
   }
 
   auto connection::do_read() -> void
@@ -93,43 +99,47 @@ namespace mp::net
       }
       else if (error != boost::asio::error::operation_aborted)
       {
-        log_error("on_read", "failed to read a request from '{}'. reason: {}", m_remote, error.message());
-        close();
+        notify_subscribers(error);
       }
     }
     else
     {
-
       do_read();
     }
   }
 
   auto connection::notify_subscribers(request_type request) -> void
   {
-    log_trace("notify_subscribers", "notifying {} subscribers about an incoming request", m_subscribers.size());
-    for_each(begin(m_subscribers), end(m_subscribers), [this, &request](auto subscriber) {
-      subscriber->on_request(shared_from_this(), request);
+    boost::asio::post(m_stream.get_executor(), [this, request, _ = shared_from_this()] {
+      log_trace("notify_subscribers", "notifying {} subscribers about an incoming request", m_subscribers.size());
+      for_each(begin(m_subscribers), end(m_subscribers), [this, &request](auto subscriber) {
+        subscriber->on_request(shared_from_this(), request);
+      });
     });
   }
 
   auto connection::notify_subscribers(error_type error) -> void
   {
-    log_trace("notify_subscribers",
-              "notifying {} subscribers about the following error: ",
-              m_subscribers.size(),
-              error.message());
-    for_each(begin(m_subscribers), end(m_subscribers), [this, &error](auto subscriber) {
-      subscriber->on_error(shared_from_this(), error);
+    boost::asio::post(m_stream.get_executor(), [this, error, _ = shared_from_this()] {
+      log_trace("notify_subscribers",
+                "notifying {} subscribers about the following error: ",
+                m_subscribers.size(),
+                error.message());
+      for_each(begin(m_subscribers), end(m_subscribers), [this, &error](auto subscriber) {
+        subscriber->on_error(shared_from_this(), error);
+      });
     });
   }
 
   auto connection::notify_subscribers(close_event) -> void
   {
-    log_trace("notify_subscribers", "notifying {} subscribers about connection closure", m_subscribers.size());
-    for_each(begin(m_subscribers), end(m_subscribers), [this](auto subscriber) {
-      subscriber->on_close(shared_from_this());
+    boost::asio::post(m_stream.get_executor(), [this, _ = shared_from_this()] {
+      log_trace("notify_subscribers", "notifying {} subscribers about connection closure", m_subscribers.size());
+      for_each(begin(m_subscribers), end(m_subscribers), [this](auto subscriber) {
+        subscriber->on_close(shared_from_this());
+      });
+      m_subscribers.clear();
     });
-    m_subscribers.clear();
   }
 
 }  // namespace mp::net

@@ -35,6 +35,7 @@ namespace mp::net
     auto stop() -> void;
 
     auto on_close(connection_ptr connection) -> void override;
+    auto on_error(connection_ptr connection, std::error_code error) -> void override;
 
   protected:
     server(boost::asio::io_context & io_context, port port, logger logger);

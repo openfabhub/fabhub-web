@@ -3,6 +3,7 @@
 
 #include "support/logger_mixin.hpp"
 
+#include <boost/asio/io_context_strand.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core/error.hpp>
 #include <boost/beast/core/flat_buffer.hpp>
@@ -38,16 +39,16 @@ namespace mp::net
 
     using subscriber_ptr = std::shared_ptr<struct event_subscriber>;
 
-    auto static create(boost::asio::ip::tcp::socket socket, logger logger) -> connection_ptr;
+    auto static create(boost::asio::io_context & io_context, boost::asio::ip::tcp::socket socket, logger logger) -> connection_ptr;
 
     auto close() -> void;
     auto start() -> void;
 
-    auto subscribe(subscriber_ptr subscriber) -> bool;
-    auto unsubscribe(subscriber_ptr subscriber) -> bool;
+    auto subscribe(subscriber_ptr subscriber) -> void;
+    auto unsubscribe(subscriber_ptr subscriber) -> void;
 
   protected:
-    connection(boost::asio::ip::tcp::socket socket, logger logger);
+    connection(boost::asio::io_context & io_context, boost::asio::ip::tcp::socket socket, logger logger);
 
   private:
     // clang-format off
@@ -62,6 +63,7 @@ namespace mp::net
     auto notify_subscribers(close_event) -> void;
 
     boost::asio::ip::tcp::endpoint m_remote;
+    boost::asio::io_context::strand m_notification_strand;
     boost::beast::tcp_stream m_stream;
     boost::beast::flat_buffer m_buffer;
     boost::beast::http::request<boost::beast::http::string_body> m_request;

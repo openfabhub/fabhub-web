@@ -8,6 +8,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/strand.hpp>
 #include <boost/beast/core/bind_handler.hpp>
+#include <boost/beast/core/error.hpp>
 #include <boost/system/system_error.hpp>
 #include <spdlog/fmt/fmt.h>
 
@@ -129,6 +130,12 @@ namespace mp::net
     log_info("on_close", "erased {} connections from the pool, {} remain", erased, m_connections.size());
   }
 
+  auto server::on_error(connection_ptr connection, std::error_code error) -> void
+  {
+    log_info("on_error", "dropping connection due to the following error: {}", error.message());
+    connection->close();
+  }
+
   auto server::do_accept() -> void
   {
     log_debug("do_accept", "waiting for an incoming connection");
@@ -146,7 +153,8 @@ namespace mp::net
     {
       auto const remote = socket.remote_endpoint();
       log_info("on_accept", "accepted new connection from '{}'", remote);
-      auto [connection, inserted] = m_connections.insert(connection::create(std::move(socket), logger_handle()));
+      auto [connection, inserted] =
+          m_connections.insert(connection::create(m_io_context, std::move(socket), logger_handle()));
       if (inserted)
       {
         (*connection)->start();
