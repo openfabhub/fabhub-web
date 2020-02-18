@@ -13,7 +13,7 @@ Fabhub's web application
 
 .. |license| image:: https://img.shields.io/github/license/openfabhub/fabhub-web
    :alt: GitHub license
-   :target: https://github.com/openfabhub/fabhub-web/blob/master/LICENSE
+   :target: LICENSE
 
 .. |travis| image:: https://travis-ci.org/openfabhub/fabhub-web.svg?branch=develop
     :target: https://travis-ci.org/openfabhub/fabhub-web
