@@ -36,7 +36,7 @@ class FabhubWebConan(ConanFile):
         "lyra/[~=1.2]",
         "spdlog/[~=1.5]",
         "CUTE/[~=2.2]@fmorgner/stable",
-        "newtype/[~=1.0]",
+        "newtype/[~=1.1]",
     )
     default_options = {
         "boost:bzip2": False,
